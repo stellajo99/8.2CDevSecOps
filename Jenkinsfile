@@ -30,7 +30,7 @@ pipeline {
                         body: """<h3>Stage: Unit & Integration Tests</h3>
                                  <p>Status: ${currentBuild.result}</p>
                                  <p>Check Jenkins for console log: ${BUILD_URL}</p>""",
-                        to: "your_email@gmail.com",
+                        to: "seoyoung.jo99@gmail.com",
                         attachmentsPattern: "**/target/*.log"
                     )
                 }
@@ -63,7 +63,7 @@ pipeline {
                         body: """<h3>Stage: Security Scan</h3>
                                  <p>Status: ${currentBuild.result}</p>
                                  <p>Check Jenkins for console log: ${BUILD_URL}</p>""",
-                        to: "your_email@gmail.com",
+                        to: "seoyoung.jo@gmail.com",
                         attachmentsPattern: "**/target/*.log"
                     )
                 }
