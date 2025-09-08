@@ -1,3 +1,4 @@
+// Jenkins pipeline
 pipeline {
     agent any
     triggers { pollSCM('* * * * *') } // check commits every 1 min
