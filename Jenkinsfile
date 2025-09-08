@@ -4,7 +4,6 @@ pipeline {
 
     options {
         timestamps()        // Add timestamps to logs
-        ansiColor('xterm')  // Colorize console output for readability
     }
 
     stages {
