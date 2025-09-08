@@ -35,7 +35,7 @@ pipeline {
                         body: """Stage: Unit & Integration Tests
                                  Status: ${currentBuild.result}
                                  Console log attached.
-                                 Build URL: <a href='${BUILD_URL}'>${BUILD_URL}""",
+                                 Build URL: ${BUILD_URL}""",
                         attachLog: true
                     )
                 }
@@ -68,7 +68,7 @@ pipeline {
                         body: """Stage: Security Scan
                                  Status: ${currentBuild.result}
                                  Console log attached.
-                                 Build URL: <a href='${BUILD_URL}'>${BUILD_URL}""",
+                                 Build URL: ${BUILD_URL}""",
                         attachLog: true,
                         attachmentsPattern: "audit.json"
                     )
