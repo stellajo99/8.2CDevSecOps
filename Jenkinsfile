@@ -1,7 +1,7 @@
 // Jenkins pipeline for SIT753 - Part 2 Task 2
 pipeline {
     agent any
-    // hello
+    // hello!!
     environment {
         EMAIL_TO = "seoyoung.jo99@gmail.com" 
     }
