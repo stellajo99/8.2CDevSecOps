@@ -1,6 +1,5 @@
 pipeline {
     agent any
-    triggers { pollSCM('* * * * *') } // Check for new commits every 1 minute
 
     options {
         timestamps()        // Add timestamps to logs
