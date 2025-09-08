@@ -1,37 +1,42 @@
-// Jenkins pipeline
+// Jenkins pipeline for SIT753 - Part 2 Task 2
 pipeline {
     agent any
     triggers { pollSCM('* * * * *') } // check commits every 1 min
 
+    environment {
+        EMAIL_TO = "seoyoung.jo99@gmail.com" 
+    }
+
     stages {
         stage('Build') {
             steps {
-                echo 'Building project... | Tool: Maven/Gradle'
+                echo 'Task: Build | Tool: Maven/Gradle | Compiling and packaging the project'
             }
         }
 
         stage('Unit and Integration Tests') {
             steps {
                 script {
-                    try {
-                        echo 'Running tests... | Tools: JUnit, Jest, Newman'
-                        sh 'npm test || true'
+                    echo 'Task: Unit & Integration Tests | Tools: JUnit, Jest, Newman'
+                    // run tests, allow pipeline to continue on failure
+                    int code = sh(returnStatus: true, script: 'npm test || true')
+                    if (code == 0) {
                         currentBuild.result = 'SUCCESS'
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        throw e
+                    } else {
+                        currentBuild.result = 'UNSTABLE'  // continue but mark warning
                     }
                 }
             }
             post {
                 always {
                     emailext(
-                        subject: "Jenkins Notification: Test Stage - ${currentBuild.result}",
+                        subject: "[${currentBuild.result}] Jenkins - Test Stage",
+                        to: env.EMAIL_TO,
                         body: """<h3>Stage: Unit & Integration Tests</h3>
-                                 <p>Status: ${currentBuild.result}</p>
-                                 <p>Check Jenkins for console log: ${BUILD_URL}</p>""",
-                        to: "seoyoung.jo99@gmail.com",
-                        attachmentsPattern: "**/target/*.log"
+                                 <p>Status: <b>${currentBuild.result}</b></p>
+                                 <p>Console log attached.</p>
+                                 <p>Build URL: <a href='${BUILD_URL}'>${BUILD_URL}</a></p>""",
+                        attachLog: true
                     )
                 }
             }
@@ -39,32 +44,33 @@ pipeline {
 
         stage('Code Analysis') {
             steps {
-                echo 'Code Analysis | Tool: SonarQube/PMD'
+                echo 'Task: Code Analysis | Tools: SonarQube, PMD, Checkstyle'
             }
         }
 
         stage('Security Scan') {
             steps {
                 script {
-                    try {
-                        echo 'Running security scan... | Tool: Snyk/OWASP'
-                        sh 'npm audit || true'
+                    echo 'Task: Security Scan | Tools: npm audit / Snyk'
+                    int code = sh(returnStatus: true, script: 'npm audit --json > audit.json || true')
+                    if (code == 0) {
                         currentBuild.result = 'SUCCESS'
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        throw e
+                    } else {
+                        currentBuild.result = 'UNSTABLE'
                     }
                 }
             }
             post {
                 always {
                     emailext(
-                        subject: "Jenkins Notification: Security Scan - ${currentBuild.result}",
+                        subject: "[${currentBuild.result}] Jenkins - Security Scan",
+                        to: env.EMAIL_TO,
                         body: """<h3>Stage: Security Scan</h3>
-                                 <p>Status: ${currentBuild.result}</p>
-                                 <p>Check Jenkins for console log: ${BUILD_URL}</p>""",
-                        to: "seoyoung.jo@gmail.com",
-                        attachmentsPattern: "**/target/*.log"
+                                 <p>Status: <b>${currentBuild.result}</b></p>
+                                 <p>Console log attached.</p>
+                                 <p>Build URL: <a href='${BUILD_URL}'>${BUILD_URL}</a></p>""",
+                        attachLog: true,
+                        attachmentsPattern: "audit.json"
                     )
                 }
             }
@@ -72,20 +78,26 @@ pipeline {
 
         stage('Deploy to Staging') {
             steps {
-                echo 'Deploying to staging... | Tool: AWS CLI, Ansible'
+                echo 'Task: Deploy to Staging | Tools: AWS CLI, Ansible, SSH'
             }
         }
 
         stage('Integration Tests on Staging') {
             steps {
-                echo 'Running staging tests... | Tool: Selenium/Newman'
+                echo 'Task: Integration Tests on Staging | Tools: Selenium, Newman'
             }
         }
 
         stage('Deploy to Production') {
             steps {
-                echo 'Deploying to production... | Tool: AWS CLI/Kubernetes'
+                echo 'Task: Deploy to Production | Tools: AWS CLI, Kubernetes'
             }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'audit.json', allowEmptyArchive: true
         }
     }
 }
