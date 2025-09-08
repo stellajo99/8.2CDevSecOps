@@ -32,10 +32,10 @@ pipeline {
                     emailext(
                         subject: "[${currentBuild.result}] Jenkins - Test Stage",
                         to: env.EMAIL_TO,
-                        body: """<h3>Stage: Unit & Integration Tests</h3>
-                                 <p>Status: <b>${currentBuild.result}</b></p>
-                                 <p>Console log attached.</p>
-                                 <p>Build URL: <a href='${BUILD_URL}'>${BUILD_URL}</a></p>""",
+                        body: """Stage: Unit & Integration Tests
+                                 Status: ${currentBuild.result}
+                                 Console log attached.
+                                 Build URL: <a href='${BUILD_URL}'>${BUILD_URL}""",
                         attachLog: true
                     )
                 }
@@ -65,10 +65,10 @@ pipeline {
                     emailext(
                         subject: "[${currentBuild.result}] Jenkins - Security Scan",
                         to: env.EMAIL_TO,
-                        body: """<h3>Stage: Security Scan</h3>
-                                 <p>Status: <b>${currentBuild.result}</b></p>
-                                 <p>Console log attached.</p>
-                                 <p>Build URL: <a href='${BUILD_URL}'>${BUILD_URL}</a></p>""",
+                        body: """Stage: Security Scan
+                                 Status: ${currentBuild.result}
+                                 Console log attached.
+                                 Build URL: <a href='${BUILD_URL}'>${BUILD_URL}""",
                         attachLog: true,
                         attachmentsPattern: "audit.json"
                     )
